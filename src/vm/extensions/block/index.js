@@ -98,6 +98,33 @@ class ExtensionBlocks {
             // Replace 'formatMessage' to a formatter which is used in the runtime.
             formatMessage = runtime.formatMessage;
         }
+
+        // 追加部分
+        this.runtime.on('PROJECT_STOP_ALL', () => {
+            this.resetAudio();
+        });
+        this.resetAudio();
+    }
+
+    resetAudio() {
+        if (this.audioCtx) {
+            this.audioCtx.close();
+        }
+        this.audioCtx = new AudioContext();
+    }
+
+    playTone (args) {
+        const oscillator = this.audioCtx.createOscillator();
+        oscillator.connect(this.audioCtx.destination);
+        oscillator.type = args.TYPE;
+        oscillator.frequency.value = Cast.toNumber(args.FREQ);
+        oscillator.start();
+        return new Promise(resolve => {
+            setTimeout(() => {
+                oscillator.stop();
+                resolve();
+            }, Cast.toNumber(args.DUR) * 1000);
+        });
     }
 
     /**
@@ -113,33 +140,38 @@ class ExtensionBlocks {
             showStatusButton: false,
             blocks: [
                 {
-                    opcode: 'do-it',
-                    blockType: BlockType.REPORTER,
+                    opcode: 'playTone',
+                    blockType: BlockType.COMMAND,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'myXtension.doIt',
+                        id: 'myBlocks.playTone',
                         default: 'do it [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
-                    func: 'doIt',
+                    func: 'playTone',
                     arguments: {
-                        SCRIPT: {
+                        FREQ: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 440
+                        },
+                        TYPE: {
                             type: ArgumentType.STRING,
-                            defaultValue: '3 + 4'
+                            menu: 'waveTypeMenu'
+                        },
+                        DUR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
                         }
                     }
                 }
             ],
             menus: {
+                waveTypeMenu: {
+                    acceptReporters: false,
+                    items: ['sine', 'square', 'sawtooth', 'triangle']
+                }
             }
         };
-    }
-
-    doIt (args) {
-        const statement = Cast.toString(args.SCRIPT);
-        const func = new Function(`return (${statement})`);
-        log.log(`doIt: ${statement}`);
-        return func.call(this);
     }
 }
 
