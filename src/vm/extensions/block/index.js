@@ -4,7 +4,6 @@ import Cast from '../../util/cast';
 import log from '../../util/log';
 import translations from './translations.json';
 import blockIcon from './block-icon.png';
-const SerialPort = require('serialport');
 
 /**
  * Formatter which is used for translation.
@@ -128,35 +127,6 @@ class ExtensionBlocks {
         });
     }
 
-    selectPort(args) {
-        if (this.selectedPort && this.selectedPort.isOpen) {
-            this.selectedPort.close(() => {
-                console.log('Port closed:', this.selectedPort.path);
-            });
-        }
-        this.selectedPort = new SerialPort(args.PORT, { baudRate: 9600 });
-        this.selectedPort.on('open', () => {
-            console.log('Port opened:', args.PORT);
-        });
-        this.selectedPort.on('error', (err) => {
-            console.error('Error opening port:', err.message);
-        });
-    }
-
-    sendToPort(args) {
-        if (this.selectedPort && this.selectedPort.isOpen) {
-            this.selectedPort.write(args.MESSAGE, (err) => {
-                if (err) {
-                    console.error('Error sending message:', err.message);
-                } else {
-                    console.log('Message sent:', args.MESSAGE);
-                }
-            });
-        } else {
-            console.error('Port not selected or not open');
-        }
-    }
-
     /**
      * @returns {object} metadata for this extension and its blocks.
      */
@@ -193,57 +163,15 @@ class ExtensionBlocks {
                             defaultValue: 1
                         }
                     }
-                },
-                {
-                    opcode: 'selectPort',
-                    blockType: BlockType.COMMAND,
-                    text: formatMessage({
-                        id: 'serialExtension.selectPort',
-                        default: 'select port [PORT]',
-                        description: 'Select a serial port'
-                    }),
-                    arguments: {
-                        PORT: {
-                            type: ArgumentType.STRING,
-                            menu: 'ports'
-                        }
-                    }
-                },
-                {
-                    opcode: 'sendToPort',
-                    blockType: BlockType.COMMAND,
-                    text: formatMessage({
-                        id: 'serialExtension.sendToPort',
-                        default: 'send [MESSAGE] to port',
-                        description: 'Send a message to the selected serial port'
-                    }),
-                    arguments: {
-                        MESSAGE: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'Hello, world!'
-                        }
-                    }
                 }
             ],
             menus: {
                 waveTypeMenu: {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
-                },
-                ports: {
-                    acceptReporters: false,
-                    items: this.getPortsMenu()
                 }
             }
         };
-    }
-
-    async getPortsMenu() {
-        const ports = await SerialPort.list();
-        return ports.map(port => ({
-            text: port.path,
-            value: port.path
-        }));
     }
 }
 
