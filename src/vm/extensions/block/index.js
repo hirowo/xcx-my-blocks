@@ -175,7 +175,7 @@ class ExtensionBlocks {
                     blockAllThreads: false,
                     text: formatMessage({
                         id: 'myBlocks.playTone',
-                        default: 'have done it [SCRIPT]',
+                        default: 'hogehoge [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
                     func: 'playTone',
