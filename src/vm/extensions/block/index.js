@@ -23,7 +23,7 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoP
  * @param {Runtime} runtime - the runtime instantiating this block package.
  * @constructor
  */
-class Scratch3NewBlocks {
+class ExtensionBlocks {
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
@@ -87,4 +87,4 @@ class Scratch3NewBlocks {
     }
 }
 
-module.exports = Scratch3NewBlocks;
+export {ExtensionBlocks as default, ExtensionBlocks as blockClass};
