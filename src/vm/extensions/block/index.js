@@ -4,6 +4,7 @@ import Cast from '../../util/cast';
 import log from '../../util/log';
 import translations from './translations.json';
 import blockIcon from './block-icon.png';
+const SerialPort = require('serialport');
 
 /**
  * Formatter which is used for translation.
@@ -127,6 +128,7 @@ class ExtensionBlocks {
         });
     }
 
+
     /**
      * @returns {object} metadata for this extension and its blocks.
      */
@@ -145,7 +147,7 @@ class ExtensionBlocks {
                     blockAllThreads: false,
                     text: formatMessage({
                         id: 'myBlocks.playTone',
-                        default: 'hoge2 [SCRIPT]',
+                        default: 'have done it [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
                     func: 'playTone',
@@ -163,16 +165,19 @@ class ExtensionBlocks {
                             defaultValue: 1
                         }
                     }
-                }
+                },
+                
+ 
             ],
             menus: {
                 waveTypeMenu: {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
-                }
+                },
             }
         };
     }
+
 }
 
 export {ExtensionBlocks as default, ExtensionBlocks as blockClass};
