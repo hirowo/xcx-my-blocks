@@ -1,7 +1,12 @@
-const ArgumentType = require('../../extension-support/argument-type');
-const BlockType = require('../../extension-support/block-type');
-const Cast = require('../../util/cast');
-const log = require('../../util/log');
+import BlockType from '../../extension-support/block-type';
+import ArgumentType from '../../extension-support/argument-type';
+import Cast from '../../util/cast';
+import log from '../../util/log';
+import translations from './translations.json';
+import blockIcon from './block-icon.png';
+
+
+
 
 /**
  * Icon svg to be displayed at the left edge of each extension block, encoded as a data URI.
