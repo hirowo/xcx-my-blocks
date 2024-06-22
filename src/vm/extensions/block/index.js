@@ -1,131 +1,38 @@
-import BlockType from '../../extension-support/block-type';
-import ArgumentType from '../../extension-support/argument-type';
-import Cast from '../../util/cast';
-import log from '../../util/log';
-import translations from './translations.json';
-import blockIcon from './block-icon.png';
-const SerialPort = require('serialport');
+const ArgumentType = require('../../extension-support/argument-type');
+const BlockType = require('../../extension-support/block-type');
+const Cast = require('../../util/cast');
+const log = require('../../util/log');
 
 /**
- * Formatter which is used for translation.
- * This will be replaced which is used in the runtime.
- * @param {object} messageData - format-message object
- * @returns {string} - message for the locale
- */
-let formatMessage = messageData => messageData.default;
-
-/**
- * Setup format-message for this extension.
- */
-const setupTranslations = () => {
-    const localeSetup = formatMessage.setup();
-    if (localeSetup && localeSetup.translations[localeSetup.locale]) {
-        Object.assign(
-            localeSetup.translations[localeSetup.locale],
-            translations[localeSetup.locale]
-        );
-    }
-};
-
-const EXTENSION_ID = 'myXtension';
-
-/**
- * URL to get this extension as a module.
- * When it was loaded as a module, 'extensionURL' will be replaced a URL which is retrieved from.
+ * Icon svg to be displayed at the left edge of each extension block, encoded as a data URI.
  * @type {string}
  */
-let extensionURL = 'https://hirowo.github.io/xcx-my-extension/dist/myXtension.mjs';
+// eslint-disable-next-line max-len
+const blockIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZyBpZD0iSUQwLjA4NjgyNDQzOTAwMDMzODMyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjQ5MTU0NjY2MDY2MTY5NzQsIDAsIDAsIDAuNDkxNTQ2NjYwNjYxNjk3NCwgLTY0LjUsIC03Ny4yNSkiPjxwYXRoIGlkPSJJRDAuNTcyMTQ2MjMwMzc3MjU2OSIgZmlsbD0iI0ZGOTQwMCIgc3Ryb2tlPSJub25lIiBkPSJNIDE4OCAxNDEgTCAyNTAgMTQxIEwgMjUwIDIwMyBMIDE4OCAyMDMgTCAxODggMTQxIFogIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjI4NzkwMzMwODg2ODQwODIsIDAsIDAsIDEuMjg3OTAzMzA4ODY4NDA4MiwgLTExMC45LCAtMjQuNCkiLz48cGF0aCBpZD0iSUQwLjYzODMzNjEzNTA3NDQ5NjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTk2IDIwNCBDIDE5NiAyMDQgMTkyLjcwNiAxOTAuMDU4IDE5MyAxODMgQyAxOTMuMDc0IDE4MS4yMzYgMTk1Ljg4NiAxNzguNDU4IDE5NyAxODAgQyAyMDEuNDU1IDE4Ni4xNjggMjAzLjQ0MyAyMDMuNzU0IDIwNiAyMDEgQyAyMDkuMjExIDE5Ny41NDIgMjEwIDE2NiAyMTAgMTY2ICIgdHJhbnNmb3JtPSJtYXRyaXgoMSwgMCwgMCwgMSwgLTU3LCAxNS44KSIvPjxwYXRoIGlkPSJJRDAuNzU4NzMwMzU2NTgxNTA5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZD0iTSAyMTUgMTY5IEMgMjE1IDE2OSAyMTguMzY3IDE2OS41MzQgMjIwIDE3MCBDIDIyMC43MTYgMTcwLjIwNSAyMjEuMjc4IDE3MC44MTkgMjIyIDE3MSBDIDIyMi42NDYgMTcxLjE2MiAyMjMuMzY4IDE3MC43ODkgMjI0IDE3MSBDIDIyNC40NDcgMTcxLjE0OSAyMjUgMTcyIDIyNSAxNzIgIiB0cmFuc2Zvcm09Im1hdHJpeCgxLCAwLCAwLCAxLCAtNTcsIDE1LjgpIi8+PHBhdGggaWQ9IklEMC4yNDM2NzMwNzMxMjc4NjU4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBkPSJNIDIyNyAxNTQgQyAyMjcgMTU0IDIxOC41NTUgMTQ3Ljg5MCAyMTcgMTUxIEMgMjEyLjM0NSAxNjAuMzEwIDIxMS4yODkgMTcxLjczMyAyMTMgMTgyIEMgMjEzLjYxMiAxODUuNjcyIDIyMyAxODcgMjIzIDE4NyAiIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIC01NywgMTUuOCkiLz48cGF0aCBpZD0iSUQwLjc5MzkzOTQ4MTk1NTAyMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTc1IDIwMC41MDAgQyAxNzUgMjAwLjUwMCAxNjkuODA1IDIyMS45MTMgMTcxIDIyMi43NTAgQyAxNzIuMTk1IDIyMy41ODcgMTc4Ljc5NSAyMDUuMjk1IDE4Mi41MDAgMjA1Ljc1MCBDIDE4NS45MjAgMjA2LjE3MCAxODEuODU5IDIyNC41MDAgMTg1LjI1MCAyMjQuNTAwIEMgMTg5LjIxMyAyMjQuNTAwIDE5Ny4yNTAgMjA1Ljc1MCAxOTcuMjUwIDIwNS43NTAgIi8+PC9nPjwvc3ZnPg==';
 
 /**
- * Scratch 3.0 blocks for example of Xcratch.
+ * Icon svg to be displayed in the category menu, encoded as a data URI.
+ * @type {string}
  */
-class ExtensionBlocks {
-    /**
-     * A translation object which is used in this class.
-     * @param {FormatObject} formatter - translation object
-     */
-    static set formatMessage (formatter) {
-        formatMessage = formatter;
-        if (formatMessage) setupTranslations();
-    }
+// eslint-disable-next-line max-len
+const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZyBpZD0iSUQwLjA4NjgyNDQzOTAwMDMzODMyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjQ5MTU0NjY2MDY2MTY5NzQsIDAsIDAsIDAuNDkxNTQ2NjYwNjYxNjk3NCwgLTY0LjUsIC03Ny4yNSkiPjxwYXRoIGlkPSJJRDAuNTcyMTQ2MjMwMzc3MjU2OSIgZmlsbD0iI0ZGOTQwMCIgc3Ryb2tlPSJub25lIiBkPSJNIDE4OCAxNDEgTCAyNTAgMTQxIEwgMjUwIDIwMyBMIDE4OCAyMDMgTCAxODggMTQxIFogIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjI4NzkwMzMwODg2ODQwODIsIDAsIDAsIDEuMjg3OTAzMzA4ODY4NDA4MiwgLTExMC45LCAtMjQuNCkiLz48cGF0aCBpZD0iSUQwLjYzODMzNjEzNTA3NDQ5NjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTk2IDIwNCBDIDE5NiAyMDQgMTkyLjcwNiAxOTAuMDU4IDE5MyAxODMgQyAxOTMuMDc0IDE4MS4yMzYgMTk1Ljg4NiAxNzguNDU4IDE5NyAxODAgQyAyMDEuNDU1IDE4Ni4xNjggMjAzLjQ0MyAyMDMuNzU0IDIwNiAyMDEgQyAyMDkuMjExIDE5Ny41NDIgMjEwIDE2NiAyMTAgMTY2ICIgdHJhbnNmb3JtPSJtYXRyaXgoMSwgMCwgMCwgMSwgLTU3LCAxNS44KSIvPjxwYXRoIGlkPSJJRDAuNzU4NzMwMzU2NTgxNTA5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZD0iTSAyMTUgMTY5IEMgMjE1IDE2OSAyMTguMzY3IDE2OS41MzQgMjIwIDE3MCBDIDIyMC43MTYgMTcwLjIwNSAyMjEuMjc4IDE3MC44MTkgMjIyIDE3MSBDIDIyMi42NDYgMTcxLjE2MiAyMjMuMzY4IDE3MC43ODkgMjI0IDE3MSBDIDIyNC40NDcgMTcxLjE0OSAyMjUgMTcyIDIyNSAxNzIgIiB0cmFuc2Zvcm09Im1hdHJpeCgxLCAwLCAwLCAxLCAtNTcsIDE1LjgpIi8+PHBhdGggaWQ9IklEMC4yNDM2NzMwNzMxMjc4NjU4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBkPSJNIDIyNyAxNTQgQyAyMjcgMTU0IDIxOC41NTUgMTQ3Ljg5MCAyMTcgMTUxIEMgMjEyLjM0NSAxNjAuMzEwIDIxMS4yODkgMTcxLjczMyAyMTMgMTgyIEMgMjEzLjYxMiAxODUuNjcyIDIyMyAxODcgMjIzIDE4NyAiIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIC01NywgMTUuOCkiLz48cGF0aCBpZD0iSUQwLjc5MzkzOTQ4MTk1NTAyMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTc1IDIwMC41MDAgQyAxNzUgMjAwLjUwMCAxNjkuODA1IDIyMS45MTMgMTcxIDIyMi43NTAgQyAxNzIuMTk1IDIyMy41ODcgMTc4Ljc5NSAyMDUuMjk1IDE4Mi41MDAgMjA1Ljc1MCBDIDE4NS45MjAgMjA2LjE3MCAxODEuODU5IDIyNC41MDAgMTg1LjI1MCAyMjQuNTAwIEMgMTg5LjIxMyAyMjQuNTAwIDE5Ny4yNTAgMjA1Ljc1MCAxOTcuMjUwIDIwNS43NTAgIi8+PC9nPjwvc3ZnPg==';
 
-    /**
-     * @return {string} - the name of this extension.
-     */
-    static get EXTENSION_NAME () {
-        return formatMessage({
-            id: 'myXtension.name',
-            default: 'My Extension',
-            description: 'name of the extension'
-        });
-    }
 
-    /**
-     * @return {string} - the ID of this extension.
-     */
-    static get EXTENSION_ID () {
-        return EXTENSION_ID;
-    }
-
-    /**
-     * URL to get this extension.
-     * @type {string}
-     */
-    static get extensionURL () {
-        return extensionURL;
-    }
-
-    /**
-     * Set URL to get this extension.
-     * The extensionURL will be changed to the URL of the loading server.
-     * @param {string} url - URL
-     */
-    static set extensionURL (url) {
-        extensionURL = url;
-    }
-
-    /**
-     * Construct a set of blocks for My Extension.
-     * @param {Runtime} runtime - the Scratch 3.0 runtime.
-     */
+/**
+ * Class for the new blocks in Scratch 3.0
+ * @param {Runtime} runtime - the runtime instantiating this block package.
+ * @constructor
+ */
+class Scratch3NewBlocks {
     constructor (runtime) {
         /**
-         * The Scratch 3.0 runtime.
+         * The runtime instantiating this block package.
          * @type {Runtime}
          */
         this.runtime = runtime;
 
-        if (runtime.formatMessage) {
-            // Replace 'formatMessage' to a formatter which is used in the runtime.
-            formatMessage = runtime.formatMessage;
-        }
-
-        // 追加部分
-        this.runtime.on('PROJECT_STOP_ALL', () => {
-            this.resetAudio();
-        });
-        this.resetAudio();
-    }
-
-    resetAudio() {
-        if (this.audioCtx) {
-            this.audioCtx.close();
-        }
-        this.audioCtx = new AudioContext();
-    }
-
-    playTone (args) {
-        const oscillator = this.audioCtx.createOscillator();
-        oscillator.connect(this.audioCtx.destination);
-        oscillator.type = args.TYPE;
-        oscillator.frequency.value = Cast.toNumber(args.FREQ);
-        oscillator.start();
-        return new Promise(resolve => {
-            setTimeout(() => {
-                oscillator.stop();
-                resolve();
-            }, Cast.toNumber(args.DUR) * 1000);
-        });
+        //this._onTargetCreated = this._onTargetCreated.bind(this);
+        //this.runtime.on('targetWasCreated', this._onTargetCreated);
     }
 
 
@@ -133,49 +40,51 @@ class ExtensionBlocks {
      * @returns {object} metadata for this extension and its blocks.
      */
     getInfo () {
-        setupTranslations();
         return {
-            id: ExtensionBlocks.EXTENSION_ID,
-            name: ExtensionBlocks.EXTENSION_NAME,
-            extensionURL: ExtensionBlocks.extensionURL,
-            blockIconURI: blockIcon,
-            showStatusButton: false,
+            id: 'newblocks',
+            name: 'New Blocks',
+            menuIconURI: menuIconURI,
+            blockIconURI: blockIconURI,
             blocks: [
                 {
-                    opcode: 'playTone',
+                    opcode: 'writeLog',
                     blockType: BlockType.COMMAND,
-                    blockAllThreads: false,
-                    text: formatMessage({
-                        id: 'myBlocks.playTone',
-                        default: 'have done it [SCRIPT]',
-                        description: 'execute javascript for example'
-                    }),
-                    func: 'playTone',
+                    text: 'log [TEXT]',
                     arguments: {
-                        FREQ: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: 440
-                        },
-                        TYPE: {
+                        TEXT: {
                             type: ArgumentType.STRING,
-                            menu: 'waveTypeMenu'
-                        },
-                        DUR: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: 1
+                            defaultValue: "hello"
                         }
                     }
+                },
+                {
+                    opcode: 'getBrowser',
+                    text: 'browser',
+                    blockType: BlockType.REPORTER
                 }
             ],
             menus: {
-                waveTypeMenu: {
-                    acceptReporters: false,
-                    items: ['sine', 'square', 'sawtooth', 'triangle']
-                }
             }
         };
     }
 
+    /**
+     * Write log.
+     * @param {object} args - the block arguments.
+     * @property {number} TEXT - the text.
+     */
+    writeLog (args) {
+        const text = Cast.toString(args.TEXT);
+        log.log(text);
+    }
+
+    /**
+     * Get the browser.
+     * @return {number} - the user agent.
+     */
+    getBrowser () {
+        return navigator.userAgent;
+    }
 }
 
-export {ExtensionBlocks as default, ExtensionBlocks as blockClass};
+module.exports = Scratch3NewBlocks;
