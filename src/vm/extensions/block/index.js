@@ -126,6 +126,9 @@ class ExtensionBlocks {
             }, Cast.toNumber(args.DUR) * 1000);
         });
     }
+	test(){
+	}
+		
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -163,7 +166,19 @@ class ExtensionBlocks {
                             defaultValue: 1
                         }
                     }
+                },
+        		{
+        			opcode: 'test',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'test',
+                        default: 'test [SCRIPT]',
+                        description: 'execute javascript for example'
+                    }),
+                    func: 'test',
                 }
+
             ],
             menus: {
                 waveTypeMenu: {
