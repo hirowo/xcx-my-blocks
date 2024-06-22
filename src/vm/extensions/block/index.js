@@ -165,15 +165,13 @@ class ExtensionBlocks {
                             defaultValue: 1
                         }
                     }
-                },
-                
- 
+                }
             ],
             menus: {
                 waveTypeMenu: {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
-                },
+                }
             }
         };
     }
