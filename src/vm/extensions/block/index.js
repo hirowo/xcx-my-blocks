@@ -178,7 +178,7 @@ class ExtensionBlocks {
                         default: 'test [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
-                    func: 'test',
+                    func: 'test'
                 }
 
             ],
