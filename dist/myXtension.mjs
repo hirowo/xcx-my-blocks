@@ -1410,20 +1410,10 @@ var ExtensionBlocks = /*#__PURE__*/function () {
             default: 'test [SCRIPT]',
             description: 'execute javascript for example'
           }),
-          func: 'test',
-          arguments: {
-            PORT: {
-              type: ArgumentType$1.STRING,
-              menu: 'ports'
-            }
-          }
+          func: 'test'
         }],
         menus: {
           waveTypeMenu: {
-            acceptReporters: false,
-            items: ['sine', 'square', 'sawtooth', 'triangle']
-          },
-          ports: {
             acceptReporters: false,
             items: ['sine', 'square', 'sawtooth', 'triangle']
           }

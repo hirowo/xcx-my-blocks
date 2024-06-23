@@ -179,12 +179,6 @@ class ExtensionBlocks {
                         description: 'execute javascript for example'
                     }),
                     func: 'test',
-                    arguments: {
-                        PORT: {
-                            type: ArgumentType.STRING,
-                            menu: 'ports'
-                        }
-                    }        			
                 }
 
             ],
@@ -193,10 +187,6 @@ class ExtensionBlocks {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
                 },
-                ports: {
-                    acceptReporters: false,
-                    items: ['sine', 'square', 'sawtooth', 'triangle']
-                }            	
             }
         };
     }
