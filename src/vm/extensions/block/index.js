@@ -212,6 +212,13 @@ class ExtensionBlocks {
             }
         };
     }
+   async getPortsMenu() {
+        const ports = await SerialPort.list();
+        return ports.map(port => ({
+            text: port.path,
+            value: port.path
+        }));
+    }	
 }
 
 export {ExtensionBlocks as default, ExtensionBlocks as blockClass};
