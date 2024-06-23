@@ -128,7 +128,19 @@ class ExtensionBlocks {
             }, Cast.toNumber(args.DUR) * 1000);
         });
     }
-	test(){
+	test(args){
+        if (this.selectedPort && this.selectedPort.isOpen) {
+            this.selectedPort.close(() => {
+                console.log('Port closed:', this.selectedPort.path);
+            });
+        }
+        this.selectedPort = new SerialPort(args.PORT, { baudRate: 9600 });
+        this.selectedPort.on('open', () => {
+            console.log('Port opened:', args.PORT);
+        });
+        this.selectedPort.on('error', (err) => {
+            console.error('Error opening port:', err.message);
+        });		
 	}
 		
 
@@ -179,6 +191,12 @@ class ExtensionBlocks {
                         description: 'execute javascript for example'
                     }),
                     func: 'test',
+                    arguments: {
+                        PORT: {
+                            type: ArgumentType.STRING,
+                            menu: 'ports'
+                        }
+                    }        			
                 }
 
             ],
@@ -186,7 +204,11 @@ class ExtensionBlocks {
                 waveTypeMenu: {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
-                }
+                },
+                ports: {
+                    acceptReporters: false,
+                    items: this.getPortsMenu()
+                }            	
             }
         };
     }
