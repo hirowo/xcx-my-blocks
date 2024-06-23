@@ -186,7 +186,7 @@ class ExtensionBlocks {
                 waveTypeMenu: {
                     acceptReporters: false,
                     items: ['sine', 'square', 'sawtooth', 'triangle']
-                },
+                }
             }
         };
     }
