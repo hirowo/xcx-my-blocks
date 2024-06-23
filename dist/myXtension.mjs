@@ -1732,23 +1732,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
     }
   }, {
     key: "test",
-    value: function test(args) {
-      var _this2 = this;
-      if (this.selectedPort && this.selectedPort.isOpen) {
-        this.selectedPort.close(function () {
-          console.log('Port closed:', _this2.selectedPort.path);
-        });
-      }
-      this.selectedPort = new SerialPort(args.PORT, {
-        baudRate: 9600
-      });
-      this.selectedPort.on('open', function () {
-        console.log('Port opened:', args.PORT);
-      });
-      this.selectedPort.on('error', function (err) {
-        console.error('Error opening port:', err.message);
-      });
-    }
+    value: function test(args) {}
 
     /**
      * @returns {object} metadata for this extension and its blocks.

@@ -129,18 +129,6 @@ class ExtensionBlocks {
         });
     }
 	test(args){
-        if (this.selectedPort && this.selectedPort.isOpen) {
-            this.selectedPort.close(() => {
-                console.log('Port closed:', this.selectedPort.path);
-            });
-        }
-        this.selectedPort = new SerialPort(args.PORT, { baudRate: 9600 });
-        this.selectedPort.on('open', () => {
-            console.log('Port opened:', args.PORT);
-        });
-        this.selectedPort.on('error', (err) => {
-            console.error('Error opening port:', err.message);
-        });		
 	}
 		
 
