@@ -5,8 +5,6 @@ import log from '../../util/log';
 import translations from './translations.json';
 import blockIcon from './block-icon.png';
 
-//const SerialPort = require('serialport');
-
 /**
  * Formatter which is used for translation.
  * This will be replaced which is used in the runtime.
@@ -128,7 +126,6 @@ class ExtensionBlocks {
             }, Cast.toNumber(args.DUR) * 1000);
         });
     }
-		
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -147,7 +144,7 @@ class ExtensionBlocks {
                     blockType: BlockType.COMMAND,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'play',
+                        id: 'myBlocks.playTone',
                         default: 'have done it [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
@@ -167,7 +164,6 @@ class ExtensionBlocks {
                         }
                     }
                 }
-
             ],
             menus: {
                 waveTypeMenu: {
