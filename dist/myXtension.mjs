@@ -1377,7 +1377,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           blockType: BlockType$1.COMMAND,
           blockAllThreads: false,
           text: formatMessage({
-            id: 'myBlocks.playTone',
+            id: 'play',
             default: 'have done it [SCRIPT]',
             description: 'execute javascript for example'
           }),

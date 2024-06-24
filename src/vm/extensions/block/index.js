@@ -144,7 +144,7 @@ class ExtensionBlocks {
                     blockType: BlockType.COMMAND,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'myBlocks.playTone',
+                        id: 'play',
                         default: 'have done it [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
