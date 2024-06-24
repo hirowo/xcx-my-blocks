@@ -1362,7 +1362,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
     }
   }, {
     key: "test",
-    value: function test(args) {}
+    value: function test() {}
 
     /**
      * @returns {object} metadata for this extension and its blocks.

@@ -128,7 +128,7 @@ class ExtensionBlocks {
             }, Cast.toNumber(args.DUR) * 1000);
         });
     }
-	test(args){
+	test(){
 	}
 		
 
