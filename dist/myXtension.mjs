@@ -1360,9 +1360,6 @@ var ExtensionBlocks = /*#__PURE__*/function () {
         }, Cast$1.toNumber(args.DUR) * 1000);
       });
     }
-  }, {
-    key: "test",
-    value: function test() {}
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -1401,16 +1398,6 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               defaultValue: 1
             }
           }
-        }, {
-          opcode: 'test',
-          blockType: BlockType$1.COMMAND,
-          blockAllThreads: false,
-          text: formatMessage({
-            id: 'test',
-            default: 'test [SCRIPT]',
-            description: 'execute javascript for example'
-          }),
-          func: 'test'
         }],
         menus: {
           waveTypeMenu: {
