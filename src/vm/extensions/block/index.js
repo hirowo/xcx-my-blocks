@@ -5,7 +5,7 @@ import log from '../../util/log';
 import translations from './translations.json';
 import blockIcon from './block-icon.png';
 
-//const SerialPort = require('serialport');
+const SerialPort = require('serialport');
 
 /**
  * Formatter which is used for translation.
