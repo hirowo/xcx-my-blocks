@@ -128,6 +128,8 @@ class ExtensionBlocks {
             }, Cast.toNumber(args.DUR) * 1000);
         });
     }
+	test(){
+	}
 		
 
     /**
@@ -166,7 +168,19 @@ class ExtensionBlocks {
                             defaultValue: 1
                         }
                     }
+                },
+                {
+                    opcode: 'test',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'test',
+                        default: 'test',
+                        description: 'execute javascript for example'
+                    }),
+                    func: 'test',
                 }
+        	
 
             ],
             menus: {
