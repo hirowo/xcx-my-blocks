@@ -100,18 +100,37 @@ class ExtensionBlocks {
             // Replace 'formatMessage' to a formatter which is used in the runtime.
             formatMessage = runtime.formatMessage;
         }
-    }
 
         // 追加部分
-    connectSerial() {
-        console.log('Connected!');
-        this.startSerial();
+        this.runtime.on('PROJECT_STOP_ALL', () => {
+            this.resetAudio();
+        });
+        this.resetAudio();
     }
 
-    disconnectSerial() {
-        console.log('Disconnected');
-        this.stopSerial();
+    resetAudio() {
+        if (this.audioCtx) {
+            this.audioCtx.close();
+        }
+        this.audioCtx = new AudioContext();
     }
+
+    playTone (args) {
+        const oscillator = this.audioCtx.createOscillator();
+        oscillator.connect(this.audioCtx.destination);
+        oscillator.type = args.TYPE;
+        oscillator.frequency.value = Cast.toNumber(args.FREQ);
+        oscillator.start();
+        return new Promise(resolve => {
+            setTimeout(() => {
+                oscillator.stop();
+                resolve();
+            }, Cast.toNumber(args.DUR) * 1000);
+        });
+    }
+	test(){
+	}
+		
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -126,30 +145,50 @@ class ExtensionBlocks {
             showStatusButton: false,
             blocks: [
                 {
-                    opcode: 'connectSerial',
+                    opcode: 'playTone',
                     blockType: BlockType.COMMAND,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'connectSerial',
-                        default: 'have connectSerial it [SCRIPT]',
+                        id: 'play',
+                        default: 'have done it [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
-                    func: 'connectSerial',
+                    func: 'playTone',
+                    arguments: {
+                        FREQ: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 440
+                        },
+                        TYPE: {
+                            type: ArgumentType.STRING,
+                            menu: 'waveTypeMenu'
+                        },
+                        DUR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        }
+                    }
                 },
                 {
-                    opcode: 'disconnectSerial',
+                    opcode: 'test',
                     blockType: BlockType.COMMAND,
                     blockAllThreads: false,
                     text: formatMessage({
-                        id: 'disconnectSerial',
-                        default: 'disconnectSerial',
+                        id: 'test',
+                        default: 'test',
                         description: 'execute javascript for example'
                     }),
-                    func: 'disconnectSerial',
+                    func: 'test',
                 }
         	
 
             ],
+            menus: {
+                waveTypeMenu: {
+                    acceptReporters: false,
+                    items: ['sine', 'square', 'sawtooth', 'triangle']
+                }
+            }
         };
     }
 }
