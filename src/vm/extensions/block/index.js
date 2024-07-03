@@ -159,6 +159,13 @@ class ExtensionBlocks {
         console.log('Disconnected');
         this.stopSerial();
     }
+    WriteSerial() {
+        if(this.stopFlag == false) {
+            
+            
+        }
+    }
+    
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -193,7 +200,19 @@ class ExtensionBlocks {
                         description: 'execute javascript for example'
                     }),
                     func: 'disconnectSerial',
-                }
+                },
+                {
+                    opcode: 'WriteSerial',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'wSerial',
+                        default: 'writeSerial',
+                        description: 'execute javascript for example'
+                    }),
+                    func: 'WriteSerial',
+                },
+            
         	
 
             ],

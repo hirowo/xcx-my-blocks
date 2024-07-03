@@ -1230,6 +1230,11 @@ var ExtensionBlocks = /*#__PURE__*/function () {
       console.log('Disconnected');
       this.stopSerial();
     }
+  }, {
+    key: "WriteSerial",
+    value: function WriteSerial() {
+      if (this.stopFlag == false) ;
+    }
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -1264,6 +1269,16 @@ var ExtensionBlocks = /*#__PURE__*/function () {
             description: 'execute javascript for example'
           }),
           func: 'disconnectSerial'
+        }, {
+          opcode: 'WriteSerial',
+          blockType: BlockType$1.COMMAND,
+          blockAllThreads: false,
+          text: formatMessage({
+            id: 'wSerial',
+            default: 'writeSerial',
+            description: 'execute javascript for example'
+          }),
+          func: 'WriteSerial'
         }]
       };
     }
