@@ -1255,7 +1255,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
           blockAllThreads: false,
           text: formatMessage({
             id: 'connectSerial',
-            default: 'connectSerial [SCRIPT]',
+            default: 'connectSerial240703 [SCRIPT]',
             description: 'execute javascript for example'
           }),
           func: 'connectSerial'
