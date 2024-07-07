@@ -1232,10 +1232,51 @@ var ExtensionBlocks = /*#__PURE__*/function () {
     }
   }, {
     key: "WriteSerial",
-    value: function WriteSerial() {
-      if (this.stopFlag == false) ;
-    }
-
+    value: function () {
+      var _WriteSerial = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+        var port, writer, data;
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!(this.stopFlag == false)) {
+                _context2.next = 19;
+                break;
+              }
+              _context2.prev = 1;
+              _context2.next = 4;
+              return navigator.serial.requestPort();
+            case 4:
+              port = _context2.sent;
+              _context2.next = 7;
+              return port.open({
+                baudRate: 9600
+              });
+            case 7:
+              writer = port.writable.getWriter();
+              data = new TextEncoder().encode("Hello, World!");
+              _context2.next = 11;
+              return writer.write(data);
+            case 11:
+              writer.releaseLock();
+              console.log("INFO: データが送信されました");
+              _context2.next = 19;
+              break;
+            case 15:
+              _context2.prev = 15;
+              _context2.t0 = _context2["catch"](1);
+              console.log("ERROR: データ送信に失敗しました");
+              console.log(_context2.t0);
+            case 19:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, this, [[1, 15]]);
+      }));
+      function WriteSerial() {
+        return _WriteSerial.apply(this, arguments);
+      }
+      return WriteSerial;
+    }()
     /**
      * @returns {object} metadata for this extension and its blocks.
      */

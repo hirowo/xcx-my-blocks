@@ -102,7 +102,7 @@ class ExtensionBlocks {
         }
     }
 
-        // 追加部分
+    // 追加部分
     async startSerial() {
         try {
             console.log("INFO: 接続が確立しました");
@@ -149,7 +149,7 @@ class ExtensionBlocks {
 
     stopSerial() {
         this.stopFlag = true;
-    }	
+    }   
     connectSerial() {
         console.log('Connected!');
         this.startSerial();
@@ -159,13 +159,23 @@ class ExtensionBlocks {
         console.log('Disconnected');
         this.stopSerial();
     }
-    WriteSerial() {
+
+    async WriteSerial() {
         if(this.stopFlag == false) {
-            
-            
+            try {
+                const port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 9600 });
+                const writer = port.writable.getWriter();
+                const data = new TextEncoder().encode("Hello, World!");
+                await writer.write(data);
+                writer.releaseLock();
+                console.log("INFO: データが送信されました");
+            } catch (error) {
+                console.log("ERROR: データ送信に失敗しました");
+                console.log(error);
+            }
         }
     }
-    
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -212,9 +222,6 @@ class ExtensionBlocks {
                     }),
                     func: 'WriteSerial',
                 }
-            
-        	
-
             ],
         };
     }
