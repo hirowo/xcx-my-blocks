@@ -1135,7 +1135,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               port = _context.sent;
               _context.next = 8;
               return port.open({
-                baudRate: 9600,
+                baudRate: 115200,
                 dataBits: 8,
                 stopBits: 1,
                 parity: "none",

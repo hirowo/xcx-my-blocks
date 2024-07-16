@@ -109,7 +109,7 @@ class ExtensionBlocks {
             this.stopFlag = false;
             const port = await navigator.serial.requestPort();
             await port.open({
-                baudRate: 9600,
+                baudRate: 115200,
                 dataBits: 8,
                 stopBits: 1,
                 parity: "none",
