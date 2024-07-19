@@ -102,70 +102,43 @@ class ExtensionBlocks {
         }
     }
 
-    // 追加部分
     async startSerial() {
         try {
             console.log("INFO: 接続が確立しました");
             this.stopFlag = false;
-            const port = await navigator.serial.requestPort();
-            await port.open({
+            this.port = await navigator.serial.requestPort();
+            await this.port.open({
                 baudRate: 115200,
                 dataBits: 8,
                 stopBits: 1,
                 parity: "none",
                 bufferSize: 255,
-                //👇設定ポイント①
-                flowControl: "hardware"
+                flowControl: "none"
             });
-            while (port.readable) {
-                const reader = port.readable.getReader();
-                try {
-                    while (!this.stopFlag) {
-                        const { value, done } = await reader.read();
-                        if (done) {
-                            console.log("INFO: 読込モード終了");
-                            break;
-                        }
-                        //👇生データはバイナリなので、ユニコード文字へデコード
-                        const inputValue = new TextDecoder().decode(value);
-                        console.log(inputValue);
-                        //👇ついでに生のバイナリ(Uint8Arrayインスタンス)も表示
-                        console.log(value);
-                    }
-                } catch (error) {
-                    console.log("ERROR: 読み出し失敗");
-                    console.log(error);
-                } finally {
-                    reader.releaseLock();
-                    await port.close();
-                    console.log("INFO: 接続を切断しました");
-                }
-            }
         } catch (error) {
-            console.log("ERRORR: ポートが開けません");
+            console.log("ERROR: ポートが開けません");
             console.log(error);
         }
     }
 
-    stopSerial() {
-        this.stopFlag = true;
+    async stopSerial() {
+        try {
+            this.stopFlag = true;
+            if (this.port) {
+                await this.port.close();
+                console.log("INFO: 接続を切断しました");
+                this.port = null;
+            }
+        } catch (error) {
+            console.log("ERROR: ポートを閉じることができません");
+            console.log(error);
+        }
     }   
-    connectSerial() {
-        console.log('Connected!');
-        this.startSerial();
-    }
-
-    disconnectSerial() {
-        console.log('Disconnected');
-        this.stopSerial();
-    }
-
+    
     async WriteSerial() {
-        if(this.stopFlag == false) {
+        if (this.port && this.port.writable) {
             try {
-                const port = await navigator.serial.requestPort();
-                await port.open({ baudRate: 9600 });
-                const writer = port.writable.getWriter();
+                const writer = this.port.writable.getWriter();
                 const data = new TextEncoder().encode("Hello, World!");
                 await writer.write(data);
                 writer.releaseLock();
@@ -174,7 +147,19 @@ class ExtensionBlocks {
                 console.log("ERROR: データ送信に失敗しました");
                 console.log(error);
             }
+        } else {
+            console.log("ERROR: ポートが開かれていません");
         }
+    }
+
+    connectSerial() {
+        console.log('Connected!');
+        this.startSerial();
+    }
+
+    disconnectSerial() {
+        console.log('Disconnected');
+        this.stopSerial();
     }
 
     /**
