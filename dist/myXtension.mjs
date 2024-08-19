@@ -1252,7 +1252,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               }
               _context4.prev = 1;
               writer = this.port.writable.getWriter();
-              data = new TextEncoder().encode("WF\r\n");
+              data = new TextEncoder().encode("WF $ \r\n");
               _context4.next = 6;
               return writer.write(data);
             case 6:
