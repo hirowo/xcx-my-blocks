@@ -180,7 +180,7 @@ class ExtensionBlocks {
                     blockAllThreads: false,
                     text: formatMessage({
                         id: 'connectSerial',
-                        default: 'connectSerial240703 [SCRIPT]',
+                        default: 'connectSerial240819 [SCRIPT]',
                         description: 'execute javascript for example'
                     }),
                     func: 'connectSerial',
