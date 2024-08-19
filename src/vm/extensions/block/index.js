@@ -151,6 +151,22 @@ class ExtensionBlocks {
             console.log("ERROR: ポートが開かれていません");
         }
     }
+    async WriteCommandA() {
+        if (this.port && this.port.writable) {
+            try {
+                const writer = this.port.writable.getWriter();
+                const data = new TextEncoder().encode("WF\r");
+                await writer.write(data);
+                writer.releaseLock();
+                console.log("INFO: データが送信されました");
+            } catch (error) {
+                console.log("ERROR: データ送信に失敗しました");
+                console.log(error);
+            }
+        } else {
+            console.log("ERROR: ポートが開かれていません");
+        }
+    }
 
     connectSerial() {
         console.log('Connected!');
@@ -206,7 +222,19 @@ class ExtensionBlocks {
                         description: 'execute javascript for example'
                     }),
                     func: 'WriteSerial',
+                },
+                {
+                    opcode: 'WriteCommandA',
+                    blockType: BlockType.COMMAND,
+                    blockAllThreads: false,
+                    text: formatMessage({
+                        id: 'wCommandA',
+                        default: 'WriteCommandA',
+                        description: 'execute javascript for example'
+                    }),
+                    func: 'WriteCommandA',
                 }
+            
             ],
         };
     }
