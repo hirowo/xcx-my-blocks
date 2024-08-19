@@ -1116,13 +1116,10 @@ var ExtensionBlocks = /*#__PURE__*/function () {
       formatMessage = runtime.formatMessage;
     }
   }
-
-  // 追加部分
   return _createClass(ExtensionBlocks, [{
     key: "startSerial",
     value: function () {
       var _startSerial = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
-        var port, reader, _yield$reader$read, value, done, inputValue;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -1132,81 +1129,29 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               _context.next = 5;
               return navigator.serial.requestPort();
             case 5:
-              port = _context.sent;
+              this.port = _context.sent;
               _context.next = 8;
-              return port.open({
+              return this.port.open({
                 baudRate: 115200,
                 dataBits: 8,
                 stopBits: 1,
                 parity: "none",
                 bufferSize: 255,
-                //👇設定ポイント①
-                flowControl: "hardware"
+                flowControl: "none"
               });
             case 8:
-              if (!port.readable) {
-                _context.next = 39;
-                break;
-              }
-              reader = port.readable.getReader();
-              _context.prev = 10;
-            case 11:
-              if (this.stopFlag) {
-                _context.next = 25;
-                break;
-              }
               _context.next = 14;
-              return reader.read();
-            case 14:
-              _yield$reader$read = _context.sent;
-              value = _yield$reader$read.value;
-              done = _yield$reader$read.done;
-              if (!done) {
-                _context.next = 20;
-                break;
-              }
-              console.log("INFO: 読込モード終了");
-              return _context.abrupt("break", 25);
-            case 20:
-              //👇生データはバイナリなので、ユニコード文字へデコード
-              inputValue = new TextDecoder().decode(value);
-              console.log(inputValue);
-              //👇ついでに生のバイナリ(Uint8Arrayインスタンス)も表示
-              console.log(value);
-              _context.next = 11;
               break;
-            case 25:
-              _context.next = 31;
-              break;
-            case 27:
-              _context.prev = 27;
-              _context.t0 = _context["catch"](10);
-              console.log("ERROR: 読み出し失敗");
+            case 10:
+              _context.prev = 10;
+              _context.t0 = _context["catch"](0);
+              console.log("ERROR: ポートが開けません");
               console.log(_context.t0);
-            case 31:
-              _context.prev = 31;
-              reader.releaseLock();
-              _context.next = 35;
-              return port.close();
-            case 35:
-              console.log("INFO: 接続を切断しました");
-              return _context.finish(31);
-            case 37:
-              _context.next = 8;
-              break;
-            case 39:
-              _context.next = 45;
-              break;
-            case 41:
-              _context.prev = 41;
-              _context.t1 = _context["catch"](0);
-              console.log("ERRORR: ポートが開けません");
-              console.log(_context.t1);
-            case 45:
+            case 14:
             case "end":
               return _context.stop();
           }
-        }, _callee, this, [[0, 41], [10, 27, 31, 37]]);
+        }, _callee, this, [[0, 10]]);
       }));
       function startSerial() {
         return _startSerial.apply(this, arguments);
@@ -1215,9 +1160,84 @@ var ExtensionBlocks = /*#__PURE__*/function () {
     }()
   }, {
     key: "stopSerial",
-    value: function stopSerial() {
-      this.stopFlag = true;
-    }
+    value: function () {
+      var _stopSerial = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.prev = 0;
+              this.stopFlag = true;
+              if (!this.port) {
+                _context2.next = 7;
+                break;
+              }
+              _context2.next = 5;
+              return this.port.close();
+            case 5:
+              console.log("INFO: 接続を切断しました");
+              this.port = null;
+            case 7:
+              _context2.next = 13;
+              break;
+            case 9:
+              _context2.prev = 9;
+              _context2.t0 = _context2["catch"](0);
+              console.log("ERROR: ポートを閉じることができません");
+              console.log(_context2.t0);
+            case 13:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, this, [[0, 9]]);
+      }));
+      function stopSerial() {
+        return _stopSerial.apply(this, arguments);
+      }
+      return stopSerial;
+    }()
+  }, {
+    key: "WriteSerial",
+    value: function () {
+      var _WriteSerial = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
+        var writer, data;
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(this.port && this.port.writable)) {
+                _context3.next = 16;
+                break;
+              }
+              _context3.prev = 1;
+              writer = this.port.writable.getWriter();
+              data = new TextEncoder().encode("Hello, World!");
+              _context3.next = 6;
+              return writer.write(data);
+            case 6:
+              writer.releaseLock();
+              console.log("INFO: データが送信されました");
+              _context3.next = 14;
+              break;
+            case 10:
+              _context3.prev = 10;
+              _context3.t0 = _context3["catch"](1);
+              console.log("ERROR: データ送信に失敗しました");
+              console.log(_context3.t0);
+            case 14:
+              _context3.next = 17;
+              break;
+            case 16:
+              console.log("ERROR: ポートが開かれていません");
+            case 17:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, this, [[1, 10]]);
+      }));
+      function WriteSerial() {
+        return _WriteSerial.apply(this, arguments);
+      }
+      return WriteSerial;
+    }()
   }, {
     key: "connectSerial",
     value: function connectSerial() {
@@ -1230,53 +1250,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
       console.log('Disconnected');
       this.stopSerial();
     }
-  }, {
-    key: "WriteSerial",
-    value: function () {
-      var _WriteSerial = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
-        var port, writer, data;
-        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              if (!(this.stopFlag == false)) {
-                _context2.next = 19;
-                break;
-              }
-              _context2.prev = 1;
-              _context2.next = 4;
-              return navigator.serial.requestPort();
-            case 4:
-              port = _context2.sent;
-              _context2.next = 7;
-              return port.open({
-                baudRate: 9600
-              });
-            case 7:
-              writer = port.writable.getWriter();
-              data = new TextEncoder().encode("Hello, World!");
-              _context2.next = 11;
-              return writer.write(data);
-            case 11:
-              writer.releaseLock();
-              console.log("INFO: データが送信されました");
-              _context2.next = 19;
-              break;
-            case 15:
-              _context2.prev = 15;
-              _context2.t0 = _context2["catch"](1);
-              console.log("ERROR: データ送信に失敗しました");
-              console.log(_context2.t0);
-            case 19:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2, this, [[1, 15]]);
-      }));
-      function WriteSerial() {
-        return _WriteSerial.apply(this, arguments);
-      }
-      return WriteSerial;
-    }()
+
     /**
      * @returns {object} metadata for this extension and its blocks.
      */
