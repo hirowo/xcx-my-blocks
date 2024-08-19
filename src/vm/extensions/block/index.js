@@ -155,7 +155,7 @@ class ExtensionBlocks {
         if (this.port && this.port.writable) {
             try {
                 const writer = this.port.writable.getWriter();
-                const data = new TextEncoder().encode("WF\r");
+                const data = new TextEncoder().encode("WF\r\n");
                 await writer.write(data);
                 writer.releaseLock();
                 console.log("INFO: データが送信されました");

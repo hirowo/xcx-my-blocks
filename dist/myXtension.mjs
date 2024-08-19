@@ -528,144 +528,130 @@ var web = {exports: {}};
 
 var minilog$2 = {exports: {}};
 
-var microee;
-var hasRequiredMicroee;
-function requireMicroee() {
-  if (hasRequiredMicroee) return microee;
-  hasRequiredMicroee = 1;
-  function M() {
-    this._events = {};
-  }
-  M.prototype = {
-    on: function on(ev, cb) {
-      this._events || (this._events = {});
-      var e = this._events;
-      (e[ev] || (e[ev] = [])).push(cb);
-      return this;
-    },
-    removeListener: function removeListener(ev, cb) {
-      var e = this._events[ev] || [],
-        i;
-      for (i = e.length - 1; i >= 0 && e[i]; i--) {
-        if (e[i] === cb || e[i].cb === cb) {
-          e.splice(i, 1);
-        }
-      }
-    },
-    removeAllListeners: function removeAllListeners(ev) {
-      if (!ev) {
-        this._events = {};
-      } else {
-        this._events[ev] && (this._events[ev] = []);
-      }
-    },
-    listeners: function listeners(ev) {
-      return this._events ? this._events[ev] || [] : [];
-    },
-    emit: function emit(ev) {
-      this._events || (this._events = {});
-      var args = Array.prototype.slice.call(arguments, 1),
-        i,
-        e = this._events[ev] || [];
-      for (i = e.length - 1; i >= 0 && e[i]; i--) {
-        e[i].apply(this, args);
-      }
-      return this;
-    },
-    when: function when(ev, cb) {
-      return this.once(ev, cb, true);
-    },
-    once: function once(ev, cb, when) {
-      if (!cb) return this;
-      function c() {
-        if (!when) this.removeListener(ev, c);
-        if (cb.apply(this, arguments) && when) this.removeListener(ev, c);
-      }
-      c.cb = cb;
-      this.on(ev, c);
-      return this;
-    }
-  };
-  M.mixin = function (dest) {
-    var o = M.prototype,
-      k;
-    for (k in o) {
-      o.hasOwnProperty(k) && (dest.prototype[k] = o[k]);
-    }
-  };
-  microee = M;
-  return microee;
+function M() {
+  this._events = {};
 }
-
-var transform;
-var hasRequiredTransform;
-function requireTransform() {
-  if (hasRequiredTransform) return transform;
-  hasRequiredTransform = 1;
-  var microee = requireMicroee();
-
-  // Implements a subset of Node's stream.Transform - in a cross-platform manner.
-  function Transform() {}
-  microee.mixin(Transform);
-
-  // The write() signature is different from Node's
-  // --> makes it much easier to work with objects in logs.
-  // One of the lessons from v1 was that it's better to target
-  // a good browser rather than the lowest common denominator
-  // internally.
-  // If you want to use external streams, pipe() to ./stringify.js first.
-  Transform.prototype.write = function (name, level, args) {
-    this.emit('item', name, level, args);
-  };
-  Transform.prototype.end = function () {
-    this.emit('end');
-    this.removeAllListeners();
-  };
-  Transform.prototype.pipe = function (dest) {
-    var s = this;
-    // prevent double piping
-    s.emit('unpipe', dest);
-    // tell the dest that it's being piped to
-    dest.emit('pipe', s);
-    function onItem() {
-      dest.write.apply(dest, Array.prototype.slice.call(arguments));
-    }
-    function onEnd() {
-      !dest._isStdio && dest.end();
-    }
-    s.on('item', onItem);
-    s.on('end', onEnd);
-    s.when('unpipe', function (from) {
-      var match = from === dest || typeof from == 'undefined';
-      if (match) {
-        s.removeListener('item', onItem);
-        s.removeListener('end', onEnd);
-        dest.emit('unpipe');
-      }
-      return match;
-    });
-    return dest;
-  };
-  Transform.prototype.unpipe = function (from) {
-    this.emit('unpipe', from);
+M.prototype = {
+  on: function on(ev, cb) {
+    this._events || (this._events = {});
+    var e = this._events;
+    (e[ev] || (e[ev] = [])).push(cb);
     return this;
-  };
-  Transform.prototype.format = function (dest) {
-    throw new Error(['Warning: .format() is deprecated in Minilog v2! Use .pipe() instead. For example:', 'var Minilog = require(\'minilog\');', 'Minilog', '  .pipe(Minilog.backends.console.formatClean)', '  .pipe(Minilog.backends.console);'].join('\n'));
-  };
-  Transform.mixin = function (dest) {
-    var o = Transform.prototype,
-      k;
-    for (k in o) {
-      o.hasOwnProperty(k) && (dest.prototype[k] = o[k]);
+  },
+  removeListener: function removeListener(ev, cb) {
+    var e = this._events[ev] || [],
+      i;
+    for (i = e.length - 1; i >= 0 && e[i]; i--) {
+      if (e[i] === cb || e[i].cb === cb) {
+        e.splice(i, 1);
+      }
     }
-  };
-  transform = Transform;
-  return transform;
-}
+  },
+  removeAllListeners: function removeAllListeners(ev) {
+    if (!ev) {
+      this._events = {};
+    } else {
+      this._events[ev] && (this._events[ev] = []);
+    }
+  },
+  listeners: function listeners(ev) {
+    return this._events ? this._events[ev] || [] : [];
+  },
+  emit: function emit(ev) {
+    this._events || (this._events = {});
+    var args = Array.prototype.slice.call(arguments, 1),
+      i,
+      e = this._events[ev] || [];
+    for (i = e.length - 1; i >= 0 && e[i]; i--) {
+      e[i].apply(this, args);
+    }
+    return this;
+  },
+  when: function when(ev, cb) {
+    return this.once(ev, cb, true);
+  },
+  once: function once(ev, cb, when) {
+    if (!cb) return this;
+    function c() {
+      if (!when) this.removeListener(ev, c);
+      if (cb.apply(this, arguments) && when) this.removeListener(ev, c);
+    }
+    c.cb = cb;
+    this.on(ev, c);
+    return this;
+  }
+};
+M.mixin = function (dest) {
+  var o = M.prototype,
+    k;
+  for (k in o) {
+    o.hasOwnProperty(k) && (dest.prototype[k] = o[k]);
+  }
+};
+var microee$1 = M;
+
+var microee = microee$1;
+
+// Implements a subset of Node's stream.Transform - in a cross-platform manner.
+function Transform$4() {}
+microee.mixin(Transform$4);
+
+// The write() signature is different from Node's
+// --> makes it much easier to work with objects in logs.
+// One of the lessons from v1 was that it's better to target
+// a good browser rather than the lowest common denominator
+// internally.
+// If you want to use external streams, pipe() to ./stringify.js first.
+Transform$4.prototype.write = function (name, level, args) {
+  this.emit('item', name, level, args);
+};
+Transform$4.prototype.end = function () {
+  this.emit('end');
+  this.removeAllListeners();
+};
+Transform$4.prototype.pipe = function (dest) {
+  var s = this;
+  // prevent double piping
+  s.emit('unpipe', dest);
+  // tell the dest that it's being piped to
+  dest.emit('pipe', s);
+  function onItem() {
+    dest.write.apply(dest, Array.prototype.slice.call(arguments));
+  }
+  function onEnd() {
+    !dest._isStdio && dest.end();
+  }
+  s.on('item', onItem);
+  s.on('end', onEnd);
+  s.when('unpipe', function (from) {
+    var match = from === dest || typeof from == 'undefined';
+    if (match) {
+      s.removeListener('item', onItem);
+      s.removeListener('end', onEnd);
+      dest.emit('unpipe');
+    }
+    return match;
+  });
+  return dest;
+};
+Transform$4.prototype.unpipe = function (from) {
+  this.emit('unpipe', from);
+  return this;
+};
+Transform$4.prototype.format = function (dest) {
+  throw new Error(['Warning: .format() is deprecated in Minilog v2! Use .pipe() instead. For example:', 'var Minilog = require(\'minilog\');', 'Minilog', '  .pipe(Minilog.backends.console.formatClean)', '  .pipe(Minilog.backends.console);'].join('\n'));
+};
+Transform$4.mixin = function (dest) {
+  var o = Transform$4.prototype,
+    k;
+  for (k in o) {
+    o.hasOwnProperty(k) && (dest.prototype[k] = o[k]);
+  }
+};
+var transform = Transform$4;
 
 // default filter
-var Transform$3 = requireTransform();
+var Transform$3 = transform;
 var levelMap = {
   debug: 1,
   info: 2,
@@ -726,7 +712,7 @@ Filter.prototype.write = function (name, level, args) {
 var filter = Filter;
 
 (function (module, exports) {
-  var Transform = requireTransform(),
+  var Transform = transform,
     Filter = filter;
   var log = new Transform(),
     slice = Array.prototype.slice;
@@ -802,7 +788,7 @@ function color$2(fg, isInverse) {
 }
 var util = color$2;
 
-var Transform$2 = requireTransform(),
+var Transform$2 = transform,
   color$1 = util;
 var colors$1 = {
     debug: ['cyan'],
@@ -823,7 +809,7 @@ logger$2.write = function (name, level, args) {
 logger$2.pipe = function () {};
 var color_1 = logger$2;
 
-var Transform$1 = requireTransform(),
+var Transform$1 = transform,
   color = util,
   colors = {
     debug: ['gray'],
@@ -852,7 +838,7 @@ logger$1.write = function (name, level, args) {
 logger$1.pipe = function () {};
 var minilog$1 = logger$1;
 
-var Transform = requireTransform();
+var Transform = transform;
 var newlines = /\n+$/,
   logger = new Transform();
 logger.write = function (name, level, args) {
@@ -886,7 +872,7 @@ var hasRequiredArray;
 function requireArray() {
   if (hasRequiredArray) return array;
   hasRequiredArray = 1;
-  var Transform = requireTransform(),
+  var Transform = transform,
     cache = [];
   var logger = new Transform();
   logger.write = function (name, level, args) {
@@ -909,7 +895,7 @@ var hasRequiredLocalstorage;
 function requireLocalstorage() {
   if (hasRequiredLocalstorage) return localstorage;
   hasRequiredLocalstorage = 1;
-  var Transform = requireTransform(),
+  var Transform = transform,
     cache = false;
   var logger = new Transform();
   logger.write = function (name, level, args) {
@@ -931,7 +917,7 @@ var hasRequiredJquery_simple;
 function requireJquery_simple() {
   if (hasRequiredJquery_simple) return jquery_simple;
   hasRequiredJquery_simple = 1;
-  var Transform = requireTransform();
+  var Transform = transform;
   var cid = new Date().valueOf().toString(36);
   function AjaxLogger(options) {
     this.url = options.url || '';
@@ -1266,7 +1252,7 @@ var ExtensionBlocks = /*#__PURE__*/function () {
               }
               _context4.prev = 1;
               writer = this.port.writable.getWriter();
-              data = new TextEncoder().encode("WF\r");
+              data = new TextEncoder().encode("WF\r\n");
               _context4.next = 6;
               return writer.write(data);
             case 6:
